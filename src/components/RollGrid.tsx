@@ -16,7 +16,15 @@ export function RollGrid({
   const rolls = Array.from({ length: expectedStudents }, (_, i) => i + 1);
 
   return (
-    <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+    <div 
+      className="grid gap-2 justify-center"
+      style={{
+        gridTemplateColumns: 'repeat(auto-fill, minmax(48px, 56px))',
+        maxWidth: '100%',
+      }}
+      role="grid"
+      aria-label="Attendance roll grid"
+    >
       {rolls.map((roll) => {
         const isMarked = markedStudents.includes(roll);
         return (
@@ -24,13 +32,16 @@ export function RollGrid({
             key={roll}
             disabled={!interactive}
             onClick={() => interactive && onToggle?.(roll)}
+            aria-label={`Roll number ${roll}, ${isMarked ? 'marked present' : 'not marked'}`}
+            aria-pressed={isMarked}
+            role="gridcell"
             className={cn(
-              "aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition-all",
-              interactive && "cursor-pointer hover:scale-105",
+              "w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-lg text-sm font-semibold transition-all duration-200",
+              interactive && "cursor-pointer hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
               !interactive && "cursor-default",
               isMarked
-                ? "bg-success text-success-foreground animate-pop shadow-lg"
-                : "bg-muted text-muted-foreground"
+                ? "bg-success text-success-foreground shadow-lg animate-pop"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             )}
           >
             {roll}
