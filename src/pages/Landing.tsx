@@ -106,8 +106,9 @@ export function Landing({ onNavigate }: LandingProps) {
       {/* Admin Link - Subtle */}
       <div className="fixed bottom-4 right-4">
         <button
-          onClick={() => onNavigate("admin-dashboard")}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors underline"
+          onClick={() => onNavigate("admin-login")}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors underline focus:outline-none focus:ring-2 focus:ring-ring rounded px-1"
+          aria-label="Go to admin login"
         >
           Admin Portal
         </button>

@@ -1,4 +1,4 @@
-import { ArrowLeft, Users, Calendar, Settings, LogIn } from "lucide-react";
+import { ArrowLeft, Users, Calendar, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminDashboardProps {
@@ -12,25 +12,40 @@ const quickStats = [
 ];
 
 const navLinks = [
-  { id: "admin-login", label: "Admin Login", icon: LogIn },
-  { id: "admin-sessions", label: "Attendance Sessions", icon: Calendar },
-  { id: "admin-teachers", label: "Teachers", icon: Users },
-  { id: "admin-settings", label: "System Settings", icon: Settings },
+  { id: "admin-sessions", label: "Attendance Sessions", icon: Calendar, description: "View and manage attendance records" },
+  { id: "admin-teachers", label: "Teachers", icon: Users, description: "Add, edit, or remove teachers" },
+  { id: "admin-settings", label: "System Settings", icon: Settings, description: "Configure system preferences" },
 ];
 
 export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
+  const handleLogout = () => {
+    // In a real app, this would clear the session
+    onNavigate("admin-login");
+  };
+
   return (
     <div className="min-h-screen pt-20 pb-8">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => onNavigate("landing")}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded-lg px-2 py-1"
+            aria-label="Go back to home"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             Back to Home
           </button>
+
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="rounded-xl gap-2"
+            aria-label="Logout from admin panel"
+          >
+            <LogOut className="w-4 h-4" aria-hidden="true" />
+            Logout
+          </Button>
         </div>
 
         {/* Title */}
@@ -52,6 +67,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
             >
               <div
                 className={`${stat.color} w-10 h-10 rounded-xl flex items-center justify-center mb-3`}
+                aria-hidden="true"
               >
                 <stat.icon className="w-5 h-5 text-white" />
               </div>
@@ -62,19 +78,21 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
         </div>
 
         {/* Navigation Cards */}
-        <div className="grid sm:grid-cols-2 gap-4">
+        <h2 className="font-serif text-xl mb-4">Quick Access</h2>
+        <div className="grid sm:grid-cols-3 gap-4">
           {navLinks.map((link) => (
-            <Button
+            <button
               key={link.id}
-              variant="outline"
               onClick={() => onNavigate(link.id)}
-              className="h-auto py-6 px-6 rounded-2xl justify-start gap-4 hover:bg-muted/50"
+              className="bg-card rounded-2xl p-6 border border-border text-left hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-ring"
+              aria-label={`Go to ${link.label}`}
             >
-              <div className="w-12 h-12 rounded-xl bg-foreground/10 flex items-center justify-center">
-                <link.icon className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mb-4">
+                <link.icon className="w-6 h-6 text-foreground" aria-hidden="true" />
               </div>
-              <span className="font-medium text-lg">{link.label}</span>
-            </Button>
+              <h3 className="font-semibold text-lg mb-1">{link.label}</h3>
+              <p className="text-sm text-muted-foreground">{link.description}</p>
+            </button>
           ))}
         </div>
       </div>

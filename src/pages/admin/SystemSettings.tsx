@@ -4,20 +4,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
 
 interface SystemSettingsProps {
   onNavigate: (page: string) => void;
 }
 
 export function SystemSettings({ onNavigate }: SystemSettingsProps) {
+  const { toast } = useToast();
   const [maxQrValidity, setMaxQrValidity] = useState(10);
   const [defaultSessionDuration, setDefaultSessionDuration] = useState(5);
+  const [maxAttendancePerSession, setMaxAttendancePerSession] = useState(100);
   const [allowManualMarking, setAllowManualMarking] = useState(true);
   const [requireDeviceVerification, setRequireDeviceVerification] = useState(false);
 
   const handleSave = () => {
     // In a real app, this would save to backend
-    console.log("Settings saved");
+    toast({
+      title: "Settings Saved",
+      description: "Your system settings have been updated successfully.",
+    });
   };
 
   return (
@@ -27,9 +33,10 @@ export function SystemSettings({ onNavigate }: SystemSettingsProps) {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => onNavigate("admin-dashboard")}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded-lg px-2 py-1"
+            aria-label="Go back to dashboard"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             Back to Dashboard
           </button>
         </div>
@@ -47,6 +54,9 @@ export function SystemSettings({ onNavigate }: SystemSettingsProps) {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="maxQr">Max QR Validity (minutes)</Label>
+                <p className="text-xs text-muted-foreground">
+                  Maximum time a QR code remains valid for scanning
+                </p>
                 <Input
                   id="maxQr"
                   type="number"
@@ -55,6 +65,7 @@ export function SystemSettings({ onNavigate }: SystemSettingsProps) {
                   value={maxQrValidity}
                   onChange={(e) => setMaxQrValidity(Number(e.target.value))}
                   className="rounded-xl max-w-xs"
+                  aria-describedby="maxQrDesc"
                 />
               </div>
 
@@ -62,6 +73,9 @@ export function SystemSettings({ onNavigate }: SystemSettingsProps) {
                 <Label htmlFor="defaultDuration">
                   Default Session Duration (minutes)
                 </Label>
+                <p className="text-xs text-muted-foreground">
+                  Default timer duration when creating new sessions
+                </p>
                 <Input
                   id="defaultDuration"
                   type="number"
@@ -74,6 +88,26 @@ export function SystemSettings({ onNavigate }: SystemSettingsProps) {
                   className="rounded-xl max-w-xs"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Capacity Settings */}
+          <div>
+            <h2 className="font-serif text-xl mb-4">Capacity Settings</h2>
+            <div className="space-y-2">
+              <Label htmlFor="maxAttendance">Max Attendance Per Session</Label>
+              <p className="text-xs text-muted-foreground">
+                Maximum number of students that can mark attendance in a single session
+              </p>
+              <Input
+                id="maxAttendance"
+                type="number"
+                min={1}
+                max={500}
+                value={maxAttendancePerSession}
+                onChange={(e) => setMaxAttendancePerSession(Number(e.target.value))}
+                className="rounded-xl max-w-xs"
+              />
             </div>
           </div>
 
@@ -91,6 +125,7 @@ export function SystemSettings({ onNavigate }: SystemSettingsProps) {
                 <Switch
                   checked={allowManualMarking}
                   onCheckedChange={setAllowManualMarking}
+                  aria-label="Allow manual marking toggle"
                 />
               </div>
 
@@ -104,6 +139,7 @@ export function SystemSettings({ onNavigate }: SystemSettingsProps) {
                 <Switch
                   checked={requireDeviceVerification}
                   onCheckedChange={setRequireDeviceVerification}
+                  aria-label="Require device verification toggle"
                 />
               </div>
             </div>
@@ -113,8 +149,9 @@ export function SystemSettings({ onNavigate }: SystemSettingsProps) {
           <Button
             onClick={handleSave}
             className="rounded-xl gap-2 bg-secondary hover:bg-secondary/90"
+            aria-label="Save system settings"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4" aria-hidden="true" />
             Save Settings
           </Button>
         </div>
