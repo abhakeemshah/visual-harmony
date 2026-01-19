@@ -1,161 +1,108 @@
-import { ArrowLeft, Save } from "lucide-react";
 import { useState } from "react";
+import { Save, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AdminLayout } from "@/components/AdminLayout";
 
-interface SystemSettingsProps {
-  onNavigate: (page: string) => void;
-}
+interface SystemSettingsProps { onNavigate: (page: string) => void; }
 
 export function SystemSettings({ onNavigate }: SystemSettingsProps) {
-  const { toast } = useToast();
-  const [maxQrValidity, setMaxQrValidity] = useState(10);
-  const [defaultSessionDuration, setDefaultSessionDuration] = useState(5);
-  const [maxAttendancePerSession, setMaxAttendancePerSession] = useState(100);
-  const [allowManualMarking, setAllowManualMarking] = useState(true);
-  const [requireDeviceVerification, setRequireDeviceVerification] = useState(false);
+  const [batchLimits, setBatchLimits] = useState({ 2023: 200, 2024: 180, 2025: 170, 2026: 150 });
+  const [qrDuration, setQrDuration] = useState("5");
+  const [failedLoginAlerts, setFailedLoginAlerts] = useState(true);
+  const [autoBackup, setAutoBackup] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [sessionReminders, setSessionReminders] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
 
-  const handleSave = () => {
-    // In a real app, this would save to backend
-    toast({
-      title: "Settings Saved",
-      description: "Your system settings have been updated successfully.",
-    });
+  const handleSave = async () => {
+    await new Promise((r) => setTimeout(r, 500));
+    setSaveStatus("success");
+    setTimeout(() => setSaveStatus("idle"), 3000);
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-8">
-      <div className="container mx-auto px-4 max-w-2xl">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => onNavigate("admin-dashboard")}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded-lg px-2 py-1"
-            aria-label="Go back to dashboard"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            Back to Dashboard
-          </button>
+    <AdminLayout currentPage="admin-settings" onNavigate={onNavigate}>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-serif text-3xl font-medium">System Settings</h1>
+        <Button onClick={handleSave} className="rounded-xl gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground">
+          <Save className="w-4 h-4" /> Save Changes
+        </Button>
+      </div>
+
+      {saveStatus === "success" && (
+        <div className="mb-6 p-4 rounded-xl bg-success/10 text-success flex items-center gap-2">
+          <CheckCircle className="w-5 h-5" /> Settings saved successfully
+        </div>
+      )}
+
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Batch Student Limits - Full Width */}
+        <div className="md:col-span-2 bg-card rounded-2xl p-6 border border-border">
+          <h2 className="font-serif text-lg mb-4">Batch Student Limits</h2>
+          <p className="text-sm text-muted-foreground mb-4">Maximum students per batch year for session creation</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Object.entries(batchLimits).map(([year, limit]) => (
+              <div key={year} className="space-y-2">
+                <Label htmlFor={`batch-${year}`}>{year}</Label>
+                <div className="flex items-center gap-2">
+                  <Input id={`batch-${year}`} type="number" min={1} max={200} value={limit} onChange={(e) => setBatchLimits({ ...batchLimits, [year]: Number(e.target.value) })} className="rounded-xl" />
+                  <span className="text-sm text-muted-foreground">students</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Title */}
-        <h1 className="font-serif text-3xl md:text-4xl font-medium mb-8">
-          System Settings
-        </h1>
+        {/* QR Session Duration */}
+        <div className="bg-card rounded-2xl p-6 border border-border">
+          <h2 className="font-serif text-lg mb-4">QR Session Duration</h2>
+          <Select value={qrDuration} onValueChange={setQrDuration}>
+            <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="3">3 minutes</SelectItem>
+              <SelectItem value="5">5 minutes</SelectItem>
+              <SelectItem value="10">10 minutes</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        {/* Settings Form */}
-        <div className="bg-card rounded-3xl p-6 md:p-8 shadow-lg border border-border space-y-8">
-          {/* Time Settings */}
-          <div>
-            <h2 className="font-serif text-xl mb-4">Time Settings</h2>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="maxQr">Max QR Validity (minutes)</Label>
-                <p className="text-xs text-muted-foreground">
-                  Maximum time a QR code remains valid for scanning
-                </p>
-                <Input
-                  id="maxQr"
-                  type="number"
-                  min={1}
-                  max={60}
-                  value={maxQrValidity}
-                  onChange={(e) => setMaxQrValidity(Number(e.target.value))}
-                  className="rounded-xl max-w-xs"
-                  aria-describedby="maxQrDesc"
-                />
-              </div>
+        {/* Security Settings */}
+        <div className="bg-card rounded-2xl p-6 border border-border">
+          <h2 className="font-serif text-lg mb-4">Security Settings</h2>
+          <div className="flex items-center justify-between">
+            <div><p className="font-medium">Failed Login Alerts</p><p className="text-sm text-muted-foreground">Get notified of failed login attempts</p></div>
+            <Switch checked={failedLoginAlerts} onCheckedChange={setFailedLoginAlerts} />
+          </div>
+        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="defaultDuration">
-                  Default Session Duration (minutes)
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  Default timer duration when creating new sessions
-                </p>
-                <Input
-                  id="defaultDuration"
-                  type="number"
-                  min={1}
-                  max={60}
-                  value={defaultSessionDuration}
-                  onChange={(e) =>
-                    setDefaultSessionDuration(Number(e.target.value))
-                  }
-                  className="rounded-xl max-w-xs"
-                />
-              </div>
+        {/* Data Backup */}
+        <div className="bg-card rounded-2xl p-6 border border-border">
+          <h2 className="font-serif text-lg mb-4">Data Backup</h2>
+          <div className="flex items-center justify-between">
+            <div><p className="font-medium">Auto Backup (Daily)</p><p className="text-sm text-muted-foreground">Automatically backup data every day</p></div>
+            <Switch checked={autoBackup} onCheckedChange={setAutoBackup} />
+          </div>
+        </div>
+
+        {/* Notifications */}
+        <div className="bg-card rounded-2xl p-6 border border-border">
+          <h2 className="font-serif text-lg mb-4">Notification Preferences</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div><p className="font-medium">Email Notifications</p></div>
+              <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+            </div>
+            <div className="flex items-center justify-between">
+              <div><p className="font-medium">Session Reminders</p></div>
+              <Switch checked={sessionReminders} onCheckedChange={setSessionReminders} />
             </div>
           </div>
-
-          {/* Capacity Settings */}
-          <div>
-            <h2 className="font-serif text-xl mb-4">Capacity Settings</h2>
-            <div className="space-y-2">
-              <Label htmlFor="maxAttendance">Max Attendance Per Session</Label>
-              <p className="text-xs text-muted-foreground">
-                Maximum number of students that can mark attendance in a single session
-              </p>
-              <Input
-                id="maxAttendance"
-                type="number"
-                min={1}
-                max={500}
-                value={maxAttendancePerSession}
-                onChange={(e) => setMaxAttendancePerSession(Number(e.target.value))}
-                className="rounded-xl max-w-xs"
-              />
-            </div>
-          </div>
-
-          {/* Feature Toggles */}
-          <div>
-            <h2 className="font-serif text-xl mb-4">Features</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-3 border-b border-border">
-                <div>
-                  <p className="font-medium">Allow Manual Marking</p>
-                  <p className="text-sm text-muted-foreground">
-                    Let teachers manually mark students in live sessions
-                  </p>
-                </div>
-                <Switch
-                  checked={allowManualMarking}
-                  onCheckedChange={setAllowManualMarking}
-                  aria-label="Allow manual marking toggle"
-                />
-              </div>
-
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-medium">Require Device Verification</p>
-                  <p className="text-sm text-muted-foreground">
-                    Students must verify their device before scanning
-                  </p>
-                </div>
-                <Switch
-                  checked={requireDeviceVerification}
-                  onCheckedChange={setRequireDeviceVerification}
-                  aria-label="Require device verification toggle"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Save Button */}
-          <Button
-            onClick={handleSave}
-            className="rounded-xl gap-2 bg-secondary hover:bg-secondary/90"
-            aria-label="Save system settings"
-          >
-            <Save className="w-4 h-4" aria-hidden="true" />
-            Save Settings
-          </Button>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
