@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, Users, Clock, BookOpen, UsersRound } from "lucide-react";
+import { CheckCircle, Download, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { QRPlaceholder } from "@/components/QRPlaceholder";
@@ -16,6 +16,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface LiveSessionProps {
   onNavigate: (page: string) => void;
@@ -25,8 +33,9 @@ interface LiveSessionProps {
 export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
   const [isSessionActive, setIsSessionActive] = useState(true);
   const [markedStudents, setMarkedStudents] = useState<number[]>([]);
+  const [showEndPopup, setShowEndPopup] = useState(false);
 
-  // Simulate random students marking attendance
+  // Simulate random students marking attendance (polling simulation)
   useEffect(() => {
     if (!isSessionActive || !sessionParams) return;
 
@@ -37,7 +46,6 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
           return prev;
         }
 
-        // Random student marking
         const unmarked = Array.from(
           { length: sessionParams.expectedStudents },
           (_, i) => i + 1
@@ -56,16 +64,45 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
 
   const handleSessionExpire = useCallback(() => {
     setIsSessionActive(false);
+    setShowEndPopup(true);
   }, []);
 
-  const handleEndSession = () => {
+  const handleEndSessionEarly = () => {
     setIsSessionActive(false);
+    setShowEndPopup(true);
+  };
+
+  const handleDownloadCSV = () => {
+    if (!sessionParams) return;
+    
+    const csvContent = [
+      "Roll Number,Status",
+      ...Array.from({ length: sessionParams.expectedStudents }, (_, i) => {
+        const roll = i + 1;
+        const status = markedStudents.includes(roll) ? "Present" : "Absent";
+        return `${roll},${status}`;
+      }),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `attendance_${sessionParams.className || "session"}_${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleBackToDashboard = () => {
+    setShowEndPopup(false);
     onNavigate("teacher-create-session");
   };
 
   if (!sessionParams) {
     return (
-      <div className="min-h-screen pt-20 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground mb-4">No active session</p>
           <Button onClick={() => onNavigate("teacher-create-session")}>
@@ -77,151 +114,195 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-8">
-      <div className="container mx-auto px-4 max-w-5xl">
-        {/* Header Navigation */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => onNavigate("teacher-create-session")}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded-lg px-2 py-1"
-            aria-label="Go back to create session"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            Back
-          </button>
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="destructive"
-                className="rounded-xl"
-                aria-label="End attendance session"
-              >
-                End Session
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>End Session Early?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will stop the attendance session immediately. Students will no longer be able to mark their attendance.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={handleEndSession}
-                  className="rounded-xl bg-destructive hover:bg-destructive/90"
-                >
-                  End Session
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-
-        {/* Session Info Header Card */}
-        <div className="bg-card rounded-3xl p-6 shadow-lg border border-border mb-6">
-          {/* Session Info Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {/* Class Name */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <BookOpen className="w-5 h-5 text-primary" aria-hidden="true" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Class</p>
-                <p className="font-semibold truncate">
-                  {sessionParams.className || "Untitled"}
-                </p>
-              </div>
-            </div>
-
-            {/* Group */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                <UsersRound className="w-5 h-5 text-accent" aria-hidden="true" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Group</p>
-                <p className="font-semibold truncate">
-                  {sessionParams.group || "—"}
-                </p>
-              </div>
-            </div>
-
-            {/* Timer Duration */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                <Clock className="w-5 h-5 text-secondary" aria-hidden="true" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Duration</p>
-                <p className="font-semibold">{sessionParams.timerDuration} min</p>
-              </div>
-            </div>
-
-            {/* Present Count */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5 text-success" aria-hidden="true" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Present</p>
-                <p className="font-semibold">
-                  <span className="text-success">{markedStudents.length}</span>
-                  <span className="text-muted-foreground"> / {sessionParams.expectedStudents}</span>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* QR and Timer Section */}
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 py-6">
-            {/* QR Placeholder - Prominent */}
-            <div className="flex-shrink-0">
-              <QRPlaceholder isActive={isSessionActive} size="lg" />
-            </div>
-
-            {/* Countdown Timer */}
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-3">Time Remaining</p>
-              <CountdownTimer
-                initialMinutes={sessionParams.timerDuration}
-                onExpire={handleSessionExpire}
-                isRunning={isSessionActive}
-              />
-              {!isSessionActive && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  QR code is no longer valid
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Attendance Roll Grid */}
-        <div className="bg-card rounded-3xl p-6 md:p-8 shadow-lg border border-border">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-serif text-xl">Attendance Grid</h2>
-            <span 
-              className={`px-4 py-1.5 rounded-full text-sm font-medium ${
-                isSessionActive 
-                  ? 'bg-success/10 text-success' 
-                  : 'bg-muted text-muted-foreground'
-              }`}
-              aria-live="polite"
-            >
-              {isSessionActive ? 'Session Active' : 'Session Ended'}
+    <div className="min-h-screen bg-background">
+      {/* Top Bar - Fixed */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 py-3">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          {/* Left: Info Pills */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-medium">
+              {sessionParams.semester} Semester
+            </span>
+            <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
+              {sessionParams.year}
+            </span>
+            <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+              {sessionParams.className}
+            </span>
+            {sessionParams.group && (
+              <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
+                {sessionParams.group}
+              </span>
+            )}
+            <span className="px-3 py-1 rounded-full bg-highlight/10 text-highlight text-xs font-medium">
+              {sessionParams.sessionType}
             </span>
           </div>
-          <RollGrid
-            expectedStudents={sessionParams.expectedStudents}
-            markedStudents={markedStudents}
-            interactive={false}
-          />
+
+          {/* Right: Status Badge */}
+          <div
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium ${
+              isSessionActive
+                ? "bg-success/10 text-success"
+                : "bg-muted text-muted-foreground"
+            }`}
+            role="status"
+            aria-live="polite"
+          >
+            {isSessionActive && (
+              <span className="w-2 h-2 rounded-full bg-success animate-pulse" aria-hidden="true" />
+            )}
+            {isSessionActive ? "Session Live" : "Session Ended"}
+          </div>
         </div>
       </div>
+
+      {/* Main Content - Split Layout */}
+      <div className="pt-16 min-h-screen">
+        <div className="max-w-7xl mx-auto p-4 lg:p-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left Side (70%) - Roll Grid */}
+            <div className="lg:w-[70%]">
+              <div className="bg-card rounded-3xl p-6 shadow-lg border border-border h-full">
+                {/* Grid Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="font-serif text-xl">Attendance Grid</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Live attendance tracking
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold">
+                      <span className="text-success">{markedStudents.length}</span>
+                      <span className="text-muted-foreground"> / {sessionParams.expectedStudents}</span>
+                    </p>
+                    <p className="text-xs text-muted-foreground">students present</p>
+                  </div>
+                </div>
+
+                {/* Roll Grid */}
+                <RollGrid
+                  expectedStudents={sessionParams.expectedStudents}
+                  markedStudents={markedStudents}
+                  interactive={false}
+                />
+
+                {/* Legend */}
+                <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-border">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-muted" aria-hidden="true" />
+                    <span className="text-sm text-muted-foreground">Absent</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-success" aria-hidden="true" />
+                    <span className="text-sm text-muted-foreground">Present</span>
+                  </div>
+                </div>
+
+                {/* End Session Button */}
+                {isSessionActive && (
+                  <div className="mt-6 pt-4 border-t border-border">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          className="w-full rounded-xl"
+                          aria-label="End attendance session early"
+                        >
+                          End Session Early
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>End Session Early?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will stop the attendance session immediately. Students will no longer be able to mark their attendance.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleEndSessionEarly}
+                            className="rounded-xl bg-destructive hover:bg-destructive/90"
+                          >
+                            End Session
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Side (30%) - QR & Timer */}
+            <div className="lg:w-[30%]">
+              <div className="bg-card rounded-3xl p-6 shadow-lg border border-border sticky top-20">
+                {/* QR Section */}
+                <div className="text-center mb-6">
+                  <h3 className="font-serif text-lg mb-4">Scan to Mark Attendance</h3>
+                  <QRPlaceholder isActive={isSessionActive} size="lg" />
+                </div>
+
+                {/* Countdown Timer */}
+                <div className="text-center pt-6 border-t border-border">
+                  <p className="text-sm text-muted-foreground mb-3">Time Remaining</p>
+                  <CountdownTimer
+                    initialMinutes={sessionParams.timerDuration}
+                    onExpire={handleSessionExpire}
+                    isRunning={isSessionActive}
+                  />
+                  {!isSessionActive && (
+                    <p className="text-sm text-muted-foreground mt-3">
+                      QR code is no longer valid
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* End Session Popup */}
+      <Dialog open={showEndPopup} onOpenChange={setShowEndPopup}>
+        <DialogContent className="rounded-3xl sm:max-w-md">
+          <DialogHeader className="text-center">
+            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-10 h-10 text-success" aria-hidden="true" />
+            </div>
+            <DialogTitle className="font-serif text-2xl">Session Complete!</DialogTitle>
+            <DialogDescription className="text-center">
+              <p className="text-lg font-semibold mt-2">
+                <span className="text-success">{markedStudents.length}</span>
+                <span className="text-muted-foreground"> / {sessionParams.expectedStudents}</span>
+                <span className="text-muted-foreground"> students marked present</span>
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Attendance record has been uploaded to server
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col gap-3 sm:flex-col">
+            <Button
+              onClick={handleDownloadCSV}
+              className="w-full rounded-xl gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+            >
+              <Download className="w-4 h-4" aria-hidden="true" />
+              Download Attendance Record
+            </Button>
+            <Button
+              onClick={handleBackToDashboard}
+              variant="outline"
+              className="w-full rounded-xl gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              Back to Dashboard
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
