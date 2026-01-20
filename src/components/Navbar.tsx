@@ -1,4 +1,4 @@
-import { Phone, Menu, X } from "lucide-react";
+import { Code2, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -22,7 +22,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
         {/* Logo */}
         <button
           onClick={() => onNavigate("landing")}
-          className="font-serif text-2xl font-medium tracking-tight"
+          className="font-serif text-2xl font-medium tracking-tight hover:opacity-80 transition-smooth"
         >
           <span className="text-secondary">F</span>ET Smart
         </button>
@@ -33,7 +33,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
             <button
               key={link.id}
               onClick={() => onNavigate(link.id)}
-              className={`text-sm font-medium transition-colors hover:text-primary ${
+              className={`text-sm font-medium transition-smooth hover:text-primary ${
                 currentPage === link.id ? "text-primary" : "text-foreground/70"
               }`}
             >
@@ -42,21 +42,22 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
           ))}
         </div>
 
-        {/* CTA Button */}
+        {/* Developers Button */}
         <div className="hidden md:flex items-center gap-4">
           <Button
             variant="outline"
             size="sm"
-            className="rounded-full gap-2 border-foreground/20"
+            onClick={() => onNavigate("developers")}
+            className="rounded-full gap-2 border-foreground/20 hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-smooth"
           >
-            <Phone className="w-4 h-4" />
-            <span>(123) 456-7890</span>
+            <Code2 className="w-4 h-4" />
+            <span>Developers</span>
           </Button>
         </div>
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden p-2"
+          className="md:hidden p-2 hover:bg-muted rounded-lg transition-smooth"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -65,7 +66,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-card border-b border-border">
+        <div className="md:hidden bg-card border-b border-border animate-slide-up">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
               <button
@@ -74,7 +75,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
                   onNavigate(link.id);
                   setMobileMenuOpen(false);
                 }}
-                className={`text-left text-sm font-medium transition-colors hover:text-primary ${
+                className={`text-left text-sm font-medium transition-smooth hover:text-primary ${
                   currentPage === link.id ? "text-primary" : "text-foreground/70"
                 }`}
               >
@@ -84,10 +85,14 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full gap-2 border-foreground/20 w-fit"
+              onClick={() => {
+                onNavigate("developers");
+                setMobileMenuOpen(false);
+              }}
+              className="rounded-full gap-2 border-foreground/20 w-fit hover:bg-secondary hover:text-secondary-foreground transition-smooth"
             >
-              <Phone className="w-4 h-4" />
-              <span>(123) 456-7890</span>
+              <Code2 className="w-4 h-4" />
+              <span>Developers</span>
             </Button>
           </div>
         </div>

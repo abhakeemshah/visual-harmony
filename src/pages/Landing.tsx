@@ -10,7 +10,7 @@ export function Landing({ onNavigate }: LandingProps) {
     <div className="min-h-screen pt-20">
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
+        <div className="max-w-4xl mx-auto text-center space-y-6 animate-slide-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-medium">
             <Sparkles className="w-4 h-4" />
             <span>Smart Attendance System</span>
@@ -18,7 +18,7 @@ export function Landing({ onNavigate }: LandingProps) {
           
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-medium leading-tight">
             An Easier, More Powerful{" "}
-            <span className="relative">
+            <span className="relative inline-block">
               Platform
               <svg
                 className="absolute -bottom-2 left-0 w-full h-3 text-primary"
@@ -47,20 +47,24 @@ export function Landing({ onNavigate }: LandingProps) {
       {/* Role Selection */}
       <section className="container mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          <RoleCard
-            title="Teacher"
-            description="Create QR sessions and monitor student attendance in real-time"
-            icon={Users}
-            onClick={() => onNavigate("teacher-auth")}
-            variant="secondary"
-          />
-          <RoleCard
-            title="Student"
-            description="Scan QR codes to mark your attendance quickly and easily"
-            icon={GraduationCap}
-            onClick={() => onNavigate("student-entry")}
-            variant="accent"
-          />
+          <div className="animate-slide-up" style={{ animationDelay: "0.1s" }}>
+            <RoleCard
+              title="Teacher"
+              description="Create QR sessions and monitor student attendance in real-time"
+              icon={Users}
+              onClick={() => onNavigate("teacher-auth")}
+              variant="secondary"
+            />
+          </div>
+          <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
+            <RoleCard
+              title="Student"
+              description="Scan QR codes to mark your attendance quickly and easily"
+              icon={GraduationCap}
+              onClick={() => onNavigate("student-entry")}
+              variant="accent"
+            />
+          </div>
         </div>
       </section>
 
@@ -68,14 +72,15 @@ export function Landing({ onNavigate }: LandingProps) {
       <section className="container mx-auto px-4 py-16">
         <div className="flex flex-wrap justify-center gap-4">
           {[
-            { bg: "bg-accent", rotate: "-rotate-6" },
-            { bg: "bg-highlight", rotate: "rotate-3" },
-            { bg: "bg-primary", rotate: "-rotate-3" },
-            { bg: "bg-secondary", rotate: "rotate-6" },
+            { bg: "bg-accent", rotate: "-rotate-6", delay: "0.1s" },
+            { bg: "bg-highlight", rotate: "rotate-3", delay: "0.2s" },
+            { bg: "bg-primary", rotate: "-rotate-3", delay: "0.3s" },
+            { bg: "bg-secondary", rotate: "rotate-6", delay: "0.4s" },
           ].map((item, index) => (
             <div
               key={index}
-              className={`${item.bg} ${item.rotate} w-20 h-24 md:w-28 md:h-32 rounded-2xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 hover:rotate-0`}
+              className={`${item.bg} ${item.rotate} w-20 h-24 md:w-28 md:h-32 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 ease-out hover:scale-110 hover:rotate-0 animate-slide-up`}
+              style={{ animationDelay: item.delay }}
             >
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/30 backdrop-blur-sm" />
             </div>
@@ -102,17 +107,6 @@ export function Landing({ onNavigate }: LandingProps) {
           </div>
         </div>
       </section>
-
-      {/* Admin Link - Subtle */}
-      <div className="fixed bottom-4 right-4">
-        <button
-          onClick={() => onNavigate("admin-login")}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors underline focus:outline-none focus:ring-2 focus:ring-ring rounded px-1"
-          aria-label="Go to admin login"
-        >
-          Admin Portal
-        </button>
-      </div>
     </div>
   );
 }

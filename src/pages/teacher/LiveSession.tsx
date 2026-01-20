@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { CheckCircle, Download, ArrowLeft } from "lucide-react";
+import { CheckCircle, Download, ArrowLeft, StopCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { QRPlaceholder } from "@/components/QRPlaceholder";
@@ -34,6 +34,7 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
   const [isSessionActive, setIsSessionActive] = useState(true);
   const [markedStudents, setMarkedStudents] = useState<number[]>([]);
   const [showEndPopup, setShowEndPopup] = useState(false);
+  const [isLastMinute, setIsLastMinute] = useState(false);
 
   // Simulate random students marking attendance (polling simulation)
   useEffect(() => {
@@ -72,6 +73,10 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
     setShowEndPopup(true);
   };
 
+  const handleTimeUpdate = useCallback((remainingSeconds: number) => {
+    setIsLastMinute(remainingSeconds <= 60 && remainingSeconds > 0);
+  }, []);
+
   const handleDownloadCSV = () => {
     if (!sessionParams) return;
     
@@ -103,7 +108,7 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
   if (!sessionParams) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center animate-fade-in">
           <p className="text-muted-foreground mb-4">No active session</p>
           <Button onClick={() => onNavigate("teacher-create-session")}>
             Create Session
@@ -141,7 +146,7 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
 
           {/* Right: Status Badge */}
           <div
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium ${
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
               isSessionActive
                 ? "bg-success/10 text-success"
                 : "bg-muted text-muted-foreground"
@@ -162,7 +167,7 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
         <div className="max-w-7xl mx-auto p-4 lg:p-6">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Left Side (70%) - Roll Grid */}
-            <div className="lg:w-[70%]">
+            <div className="lg:w-[70%] animate-slide-up">
               <div className="bg-card rounded-3xl p-6 shadow-lg border border-border h-full">
                 {/* Grid Header */}
                 <div className="flex items-center justify-between mb-6">
@@ -199,64 +204,71 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
                     <span className="text-sm text-muted-foreground">Present</span>
                   </div>
                 </div>
-
-                {/* End Session Button */}
-                {isSessionActive && (
-                  <div className="mt-6 pt-4 border-t border-border">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          className="w-full rounded-xl"
-                          aria-label="End attendance session early"
-                        >
-                          End Session Early
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>End Session Early?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This will stop the attendance session immediately. Students will no longer be able to mark their attendance.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={handleEndSessionEarly}
-                            className="rounded-xl bg-destructive hover:bg-destructive/90"
-                          >
-                            End Session
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Right Side (30%) - QR & Timer */}
-            <div className="lg:w-[30%]">
+            <div className="lg:w-[30%] animate-slide-up" style={{ animationDelay: "0.1s" }}>
               <div className="bg-card rounded-3xl p-6 shadow-lg border border-border sticky top-20">
                 {/* QR Section */}
-                <div className="text-center mb-6">
+                <div className="text-center">
                   <h3 className="font-serif text-lg mb-4">Scan to Mark Attendance</h3>
-                  <QRPlaceholder isActive={isSessionActive} size="lg" />
-                </div>
+                  
+                  {/* QR Box with animation inside */}
+                  <div className="relative mx-auto mb-6">
+                    <QRPlaceholder isActive={isSessionActive} size="lg" />
+                  </div>
 
-                {/* Countdown Timer */}
-                <div className="text-center pt-6 border-t border-border">
-                  <p className="text-sm text-muted-foreground mb-3">Time Remaining</p>
-                  <CountdownTimer
-                    initialMinutes={sessionParams.timerDuration}
-                    onExpire={handleSessionExpire}
-                    isRunning={isSessionActive}
-                  />
-                  {!isSessionActive && (
-                    <p className="text-sm text-muted-foreground mt-3">
-                      QR code is no longer valid
-                    </p>
+                  {/* Countdown Timer - Smaller */}
+                  <div className="pt-4 border-t border-border">
+                    <p className="text-sm text-muted-foreground mb-2">Time Remaining</p>
+                    <CountdownTimer
+                      initialMinutes={sessionParams.timerDuration}
+                      onExpire={handleSessionExpire}
+                      onTimeUpdate={handleTimeUpdate}
+                      isRunning={isSessionActive}
+                      size="sm"
+                    />
+                    {!isSessionActive && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        QR code is no longer valid
+                      </p>
+                    )}
+                  </div>
+
+                  {/* End Session Button - Inside QR Box */}
+                  {isSessionActive && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            className="w-full rounded-xl gap-2 transition-all duration-200 hover:scale-[1.02]"
+                            aria-label="End attendance session early"
+                          >
+                            <StopCircle className="w-4 h-4" />
+                            End Session Early
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="animate-scale-in">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>End Session Early?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will stop the attendance session immediately. Students will no longer be able to mark their attendance.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleEndSessionEarly}
+                              className="rounded-xl bg-destructive hover:bg-destructive/90"
+                            >
+                              End Session
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   )}
                 </div>
               </div>
@@ -267,7 +279,7 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
 
       {/* End Session Popup */}
       <Dialog open={showEndPopup} onOpenChange={setShowEndPopup}>
-        <DialogContent className="rounded-3xl sm:max-w-md">
+        <DialogContent className="rounded-3xl sm:max-w-md animate-scale-in">
           <DialogHeader className="text-center">
             <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-10 h-10 text-success" aria-hidden="true" />
@@ -287,7 +299,7 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
           <DialogFooter className="flex flex-col gap-3 sm:flex-col">
             <Button
               onClick={handleDownloadCSV}
-              className="w-full rounded-xl gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+              className="w-full rounded-xl gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 hover:scale-[1.02]"
             >
               <Download className="w-4 h-4" aria-hidden="true" />
               Download Attendance Record
@@ -295,7 +307,7 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
             <Button
               onClick={handleBackToDashboard}
               variant="outline"
-              className="w-full rounded-xl gap-2"
+              className="w-full rounded-xl gap-2 transition-all duration-200 hover:scale-[1.02]"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               Back to Dashboard
