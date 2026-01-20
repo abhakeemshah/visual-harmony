@@ -133,49 +133,79 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
     onNavigate("teacher-live-session");
   };
 
+  // Toggle button component for cleaner code
+  const ToggleButton = ({
+    options,
+    value,
+    onChange,
+  }: {
+    options: readonly string[];
+    value: string;
+    onChange: (val: string) => void;
+  }) => (
+    <div className="flex gap-2 p-1 bg-muted rounded-xl">
+      {options.map((option) => (
+        <button
+          key={option}
+          type="button"
+          onClick={() => onChange(option)}
+          className={cn(
+            "flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-300",
+            value === option
+              ? "bg-primary text-primary-foreground shadow-md"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+          aria-pressed={value === option}
+        >
+          {option === "1st" || option === "2nd" ? `${option} Semester` : option}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <div className="min-h-screen pt-20 flex items-center justify-center pb-8">
       <div className="w-full max-w-2xl px-4">
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-smooth mb-6 focus:outline-none focus:ring-2 focus:ring-ring rounded-lg px-2 py-1"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-all duration-300 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg px-2 py-1"
           aria-label={currentStep === 0 ? "Return to login" : "Go to previous step"}
         >
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+          <ArrowLeft className="w-4 h-4" />
           {currentStep === 0 ? "Back" : "Previous"}
         </button>
 
-        {/* Page Title - Larger */}
+        {/* Page Title */}
         <h1 className="font-serif text-3xl md:text-4xl font-medium mb-8 text-center animate-slide-up">
           Create Session
         </h1>
 
-        {/* Stepper - Smaller and Centered */}
-        <div className="flex items-center justify-center gap-4 md:gap-8 mb-10 animate-slide-up" style={{ animationDelay: "0.1s" }} role="navigation" aria-label="Form steps">
+        {/* Stepper - Centered and compact */}
+        <div className="flex items-center justify-center gap-3 md:gap-6 mb-10 animate-slide-up" style={{ animationDelay: "0.1s" }} role="navigation" aria-label="Form steps">
           {STEPS.map((step, index) => (
             <div key={step} className="flex items-center">
               <div className="flex flex-col items-center">
                 <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300",
+                    "w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300",
                     index < currentStep
-                      ? "bg-success text-success-foreground scale-100"
+                      ? "bg-success text-success-foreground"
                       : index === currentStep
-                      ? "bg-secondary text-secondary-foreground scale-110"
-                      : "bg-muted text-muted-foreground scale-100"
+                      ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                      : "bg-muted text-muted-foreground"
                   )}
                   aria-current={index === currentStep ? "step" : undefined}
                 >
                   {index < currentStep ? (
-                    <Check className="w-4 h-4" aria-hidden="true" />
+                    <Check className="w-4 h-4" />
                   ) : (
                     index + 1
                   )}
                 </div>
                 <span className={cn(
-                  "text-xs mt-2 transition-colors",
-                  index === currentStep ? "text-foreground font-medium" : "text-muted-foreground"
+                  "text-xs mt-2 font-medium transition-colors",
+                  index === currentStep ? "text-foreground" : "text-muted-foreground"
                 )}>
                   {step}
                 </span>
@@ -183,7 +213,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               {index < STEPS.length - 1 && (
                 <div
                   className={cn(
-                    "w-8 md:w-12 h-0.5 mx-2",
+                    "w-8 md:w-12 h-0.5 mx-3",
                     index < currentStep ? "bg-success" : "bg-muted"
                   )}
                   aria-hidden="true"
@@ -193,41 +223,29 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
           ))}
         </div>
 
-        {/* Form Card - Larger */}
-        <div className="bg-card rounded-3xl p-8 md:p-10 shadow-lg border border-border animate-scale-in">
+        {/* Form Card */}
+        <div className="bg-card rounded-3xl p-8 md:p-10 shadow-xl border border-border animate-scale-in">
           {/* Step 0 - Basics */}
           {currentStep === 0 && (
             <div className="space-y-6 animate-fade-in">
               {/* Semester Toggle */}
               <div className="space-y-3">
-                <Label className="text-base">Semester</Label>
-                <div className="flex gap-3">
-                  {(["1st", "2nd"] as const).map((sem) => (
-                    <Button
-                      key={sem}
-                      type="button"
-                      variant={semester === sem ? "default" : "outline"}
-                      onClick={() => setSemester(sem)}
-                      className={cn(
-                        "flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]",
-                        semester === sem && "bg-secondary text-secondary-foreground"
-                      )}
-                      aria-pressed={semester === sem}
-                    >
-                      {sem} Semester
-                    </Button>
-                  ))}
-                </div>
+                <Label className="text-sm font-medium">Semester</Label>
+                <ToggleButton
+                  options={["1st", "2nd"] as const}
+                  value={semester}
+                  onChange={(v) => setSemester(v as "1st" | "2nd")}
+                />
               </div>
 
               {/* Year Dropdown */}
               <div className="space-y-3">
-                <Label htmlFor="year" className="text-base">Year</Label>
+                <Label htmlFor="year" className="text-sm font-medium">Year</Label>
                 <Select
                   value={year.toString()}
                   onValueChange={(v) => handleYearChange(Number(v))}
                 >
-                  <SelectTrigger id="year" className="rounded-xl h-12 text-base">
+                  <SelectTrigger id="year" className="rounded-xl h-12">
                     <SelectValue placeholder="Select year" />
                   </SelectTrigger>
                   <SelectContent>
@@ -242,29 +260,17 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
 
               {/* Shift Toggle */}
               <div className="space-y-3">
-                <Label className="text-base">Shift</Label>
-                <div className="flex gap-3">
-                  {(["Morning", "Evening"] as const).map((s) => (
-                    <Button
-                      key={s}
-                      type="button"
-                      variant={shift === s ? "default" : "outline"}
-                      onClick={() => setShift(s)}
-                      className={cn(
-                        "flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]",
-                        shift === s && "bg-secondary text-secondary-foreground"
-                      )}
-                      aria-pressed={shift === s}
-                    >
-                      {s}
-                    </Button>
-                  ))}
-                </div>
+                <Label className="text-sm font-medium">Shift</Label>
+                <ToggleButton
+                  options={["Morning", "Evening"] as const}
+                  value={shift}
+                  onChange={(v) => setShift(v as "Morning" | "Evening")}
+                />
               </div>
 
               {/* Class Name */}
               <div className="space-y-3">
-                <Label htmlFor="className" className="text-base">Class Name *</Label>
+                <Label htmlFor="className" className="text-sm font-medium">Class Name *</Label>
                 <Input
                   id="className"
                   type="text"
@@ -272,20 +278,20 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                   value={className}
                   onChange={(e) => setClassName(e.target.value)}
                   required
-                  className="rounded-xl h-12 text-base transition-all duration-200 focus:scale-[1.01]"
+                  className="rounded-xl h-12"
                 />
               </div>
 
               {/* Group */}
               <div className="space-y-3">
-                <Label htmlFor="group" className="text-base">Group (optional)</Label>
+                <Label htmlFor="group" className="text-sm font-medium">Group (optional)</Label>
                 <Input
                   id="group"
                   type="text"
                   placeholder="e.g., Section A"
                   value={group}
                   onChange={(e) => setGroup(e.target.value)}
-                  className="rounded-xl h-12 text-base transition-all duration-200 focus:scale-[1.01]"
+                  className="rounded-xl h-12"
                 />
               </div>
             </div>
@@ -296,41 +302,29 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
             <div className="space-y-6 animate-fade-in">
               {/* Session Type Toggle */}
               <div className="space-y-3">
-                <Label className="text-base">Session Type</Label>
-                <div className="flex gap-3">
-                  {(["Theory", "Practical"] as const).map((type) => (
-                    <Button
-                      key={type}
-                      type="button"
-                      variant={sessionType === type ? "default" : "outline"}
-                      onClick={() => setSessionType(type)}
-                      className={cn(
-                        "flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]",
-                        sessionType === type && "bg-secondary text-secondary-foreground"
-                      )}
-                      aria-pressed={sessionType === type}
-                    >
-                      {type}
-                    </Button>
-                  ))}
-                </div>
+                <Label className="text-sm font-medium">Session Type</Label>
+                <ToggleButton
+                  options={["Theory", "Practical"] as const}
+                  value={sessionType}
+                  onChange={(v) => setSessionType(v as "Theory" | "Practical")}
+                />
               </div>
 
               {/* Session Date */}
               <div className="space-y-3">
-                <Label htmlFor="sessionDate" className="text-base">Session Date</Label>
+                <Label htmlFor="sessionDate" className="text-sm font-medium">Session Date</Label>
                 <Input
                   id="sessionDate"
                   type="date"
                   value={sessionDate}
                   onChange={(e) => setSessionDate(e.target.value)}
-                  className="rounded-xl h-12 text-base"
+                  className="rounded-xl h-12"
                 />
               </div>
 
               {/* Start Time */}
               <div className="space-y-3">
-                <Label htmlFor="startTime" className="text-base">Start Time</Label>
+                <Label htmlFor="startTime" className="text-sm font-medium">Start Time</Label>
                 <Select
                   value={startTime}
                   onValueChange={(v) => {
@@ -343,7 +337,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                     }
                   }}
                 >
-                  <SelectTrigger id="startTime" className="rounded-xl h-12 text-base">
+                  <SelectTrigger id="startTime" className="rounded-xl h-12">
                     <SelectValue placeholder="Select start time" />
                   </SelectTrigger>
                   <SelectContent>
@@ -358,9 +352,9 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
 
               {/* End Time */}
               <div className="space-y-3">
-                <Label htmlFor="endTime" className="text-base">End Time</Label>
+                <Label htmlFor="endTime" className="text-sm font-medium">End Time</Label>
                 <Select value={endTime} onValueChange={setEndTime}>
-                  <SelectTrigger id="endTime" className="rounded-xl h-12 text-base">
+                  <SelectTrigger id="endTime" className="rounded-xl h-12">
                     <SelectValue placeholder="Select end time" />
                   </SelectTrigger>
                   <SelectContent>
@@ -381,8 +375,8 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               {/* Expected Students Slider */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="expectedStudents" className="text-base">Expected Students</Label>
-                  <span className="text-lg font-bold bg-secondary/10 text-secondary px-4 py-2 rounded-xl">
+                  <Label htmlFor="expectedStudents" className="text-sm font-medium">Expected Students</Label>
+                  <span className="text-lg font-bold bg-primary/10 text-primary px-4 py-2 rounded-xl">
                     {expectedStudents}
                   </span>
                 </div>
@@ -403,35 +397,23 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
 
               {/* Timer Duration Selector */}
               <div className="space-y-3">
-                <Label className="text-base">Timer Duration</Label>
-                <div className="flex gap-3">
-                  {[3, 5].map((duration) => (
-                    <Button
-                      key={duration}
-                      type="button"
-                      variant={timerDuration === duration ? "default" : "outline"}
-                      onClick={() => setTimerDuration(duration)}
-                      className={cn(
-                        "flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]",
-                        timerDuration === duration && "bg-secondary text-secondary-foreground"
-                      )}
-                      aria-pressed={timerDuration === duration}
-                    >
-                      {duration} min
-                    </Button>
-                  ))}
-                </div>
+                <Label className="text-sm font-medium">Timer Duration</Label>
+                <ToggleButton
+                  options={["3 min", "5 min"] as const}
+                  value={`${timerDuration} min`}
+                  onChange={(v) => setTimerDuration(parseInt(v))}
+                />
               </div>
 
               {/* Notes */}
               <div className="space-y-3">
-                <Label htmlFor="notes" className="text-base">Notes (optional)</Label>
+                <Label htmlFor="notes" className="text-sm font-medium">Notes (optional)</Label>
                 <Textarea
                   id="notes"
                   placeholder="Any additional notes for this session..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="rounded-xl resize-none text-base transition-all duration-200 focus:scale-[1.01]"
+                  className="rounded-xl resize-none"
                   rows={4}
                 />
               </div>
@@ -444,7 +426,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               type="button"
               variant="outline"
               onClick={handleBack}
-              className="flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]"
+              className="flex-1 rounded-xl h-12 transition-all duration-300"
             >
               {currentStep === 0 ? "Cancel" : "Back"}
             </Button>
@@ -453,7 +435,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                 type="button"
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex-1 rounded-xl h-12 text-base bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 hover:scale-[1.02]"
+                className="flex-1 rounded-xl h-12 bg-primary hover:bg-primary/90 transition-all duration-300"
               >
                 Next
               </Button>
@@ -461,7 +443,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               <Button
                 type="button"
                 onClick={handleSubmit}
-                className="flex-1 rounded-xl h-12 text-base bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-200 hover:scale-[1.02]"
+                className="flex-1 rounded-xl h-12 bg-success hover:bg-success/90 text-success-foreground transition-all duration-300"
               >
                 Start Session
               </Button>
