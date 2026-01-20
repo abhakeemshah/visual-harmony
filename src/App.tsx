@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Landing } from "@/pages/Landing";
 import { About } from "@/pages/About";
 import { Contact } from "@/pages/Contact";
+import { Developers } from "@/pages/Developers";
 import { TeacherAuth } from "@/pages/teacher/Auth";
 import { CreateSession, SessionParams } from "@/pages/teacher/CreateSession";
 import { LiveSession } from "@/pages/teacher/LiveSession";
@@ -25,6 +26,7 @@ type Page =
   | "landing"
   | "about"
   | "contact"
+  | "developers"
   | "teacher-auth"
   | "teacher-create-session"
   | "teacher-live-session"
@@ -36,6 +38,17 @@ type Page =
   | "admin-teachers"
   | "admin-settings";
 
+// Pages where navbar should be hidden
+const NAVBAR_HIDDEN_PAGES: Page[] = [
+  "teacher-live-session",
+  "student-scan",
+  "admin-dashboard",
+  "admin-login",
+  "admin-sessions",
+  "admin-teachers",
+  "admin-settings",
+];
+
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>("landing");
   const [sessionParams, setSessionParams] = useState<SessionParams | null>(null);
@@ -43,8 +56,10 @@ function AppContent() {
 
   const handleNavigate = (page: string) => {
     setCurrentPage(page as Page);
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const showNavbar = !NAVBAR_HIDDEN_PAGES.includes(currentPage);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -54,6 +69,8 @@ function AppContent() {
         return <About onNavigate={handleNavigate} />;
       case "contact":
         return <Contact onNavigate={handleNavigate} />;
+      case "developers":
+        return <Developers onNavigate={handleNavigate} />;
       case "teacher-auth":
         return <TeacherAuth onNavigate={handleNavigate} />;
       case "teacher-create-session":
@@ -101,7 +118,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar currentPage={currentPage} onNavigate={handleNavigate} />
+      {showNavbar && <Navbar currentPage={currentPage} onNavigate={handleNavigate} />}
       {renderPage()}
     </div>
   );

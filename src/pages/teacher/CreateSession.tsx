@@ -135,48 +135,55 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
 
   return (
     <div className="min-h-screen pt-20 flex items-center justify-center pb-8">
-      <div className="w-full max-w-lg px-4">
+      <div className="w-full max-w-2xl px-4">
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 focus:outline-none focus:ring-2 focus:ring-ring rounded-lg px-2 py-1"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-smooth mb-6 focus:outline-none focus:ring-2 focus:ring-ring rounded-lg px-2 py-1"
           aria-label={currentStep === 0 ? "Return to login" : "Go to previous step"}
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           {currentStep === 0 ? "Back" : "Previous"}
         </button>
 
-        {/* Page Title */}
-        <h1 className="font-serif text-2xl font-medium mb-6">Create Session</h1>
+        {/* Page Title - Larger */}
+        <h1 className="font-serif text-3xl md:text-4xl font-medium mb-8 text-center animate-slide-up">
+          Create Session
+        </h1>
 
-        {/* Stepper */}
-        <div className="flex items-center justify-between mb-8" role="navigation" aria-label="Form steps">
+        {/* Stepper - Smaller and Centered */}
+        <div className="flex items-center justify-center gap-4 md:gap-8 mb-10 animate-slide-up" style={{ animationDelay: "0.1s" }} role="navigation" aria-label="Form steps">
           {STEPS.map((step, index) => (
-            <div key={step} className="flex items-center flex-1">
+            <div key={step} className="flex items-center">
               <div className="flex flex-col items-center">
                 <div
                   className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors",
+                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300",
                     index < currentStep
-                      ? "bg-success text-success-foreground"
+                      ? "bg-success text-success-foreground scale-100"
                       : index === currentStep
-                      ? "bg-secondary text-secondary-foreground"
-                      : "bg-muted text-muted-foreground"
+                      ? "bg-secondary text-secondary-foreground scale-110"
+                      : "bg-muted text-muted-foreground scale-100"
                   )}
                   aria-current={index === currentStep ? "step" : undefined}
                 >
                   {index < currentStep ? (
-                    <Check className="w-5 h-5" aria-hidden="true" />
+                    <Check className="w-4 h-4" aria-hidden="true" />
                   ) : (
                     index + 1
                   )}
                 </div>
-                <span className="text-xs mt-1 text-muted-foreground">{step}</span>
+                <span className={cn(
+                  "text-xs mt-2 transition-colors",
+                  index === currentStep ? "text-foreground font-medium" : "text-muted-foreground"
+                )}>
+                  {step}
+                </span>
               </div>
               {index < STEPS.length - 1 && (
                 <div
                   className={cn(
-                    "flex-1 h-0.5 mx-2",
+                    "w-8 md:w-12 h-0.5 mx-2",
                     index < currentStep ? "bg-success" : "bg-muted"
                   )}
                   aria-hidden="true"
@@ -186,15 +193,15 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
           ))}
         </div>
 
-        {/* Form Card */}
-        <div className="bg-card rounded-3xl p-8 shadow-lg border border-border">
+        {/* Form Card - Larger */}
+        <div className="bg-card rounded-3xl p-8 md:p-10 shadow-lg border border-border animate-scale-in">
           {/* Step 0 - Basics */}
           {currentStep === 0 && (
-            <div className="space-y-5">
+            <div className="space-y-6 animate-fade-in">
               {/* Semester Toggle */}
-              <div className="space-y-2">
-                <Label>Semester</Label>
-                <div className="flex gap-2">
+              <div className="space-y-3">
+                <Label className="text-base">Semester</Label>
+                <div className="flex gap-3">
                   {(["1st", "2nd"] as const).map((sem) => (
                     <Button
                       key={sem}
@@ -202,7 +209,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                       variant={semester === sem ? "default" : "outline"}
                       onClick={() => setSemester(sem)}
                       className={cn(
-                        "flex-1 rounded-xl",
+                        "flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]",
                         semester === sem && "bg-secondary text-secondary-foreground"
                       )}
                       aria-pressed={semester === sem}
@@ -214,13 +221,13 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               </div>
 
               {/* Year Dropdown */}
-              <div className="space-y-2">
-                <Label htmlFor="year">Year</Label>
+              <div className="space-y-3">
+                <Label htmlFor="year" className="text-base">Year</Label>
                 <Select
                   value={year.toString()}
                   onValueChange={(v) => handleYearChange(Number(v))}
                 >
-                  <SelectTrigger id="year" className="rounded-xl">
+                  <SelectTrigger id="year" className="rounded-xl h-12 text-base">
                     <SelectValue placeholder="Select year" />
                   </SelectTrigger>
                   <SelectContent>
@@ -234,9 +241,9 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               </div>
 
               {/* Shift Toggle */}
-              <div className="space-y-2">
-                <Label>Shift</Label>
-                <div className="flex gap-2">
+              <div className="space-y-3">
+                <Label className="text-base">Shift</Label>
+                <div className="flex gap-3">
                   {(["Morning", "Evening"] as const).map((s) => (
                     <Button
                       key={s}
@@ -244,7 +251,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                       variant={shift === s ? "default" : "outline"}
                       onClick={() => setShift(s)}
                       className={cn(
-                        "flex-1 rounded-xl",
+                        "flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]",
                         shift === s && "bg-secondary text-secondary-foreground"
                       )}
                       aria-pressed={shift === s}
@@ -256,8 +263,8 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               </div>
 
               {/* Class Name */}
-              <div className="space-y-2">
-                <Label htmlFor="className">Class Name *</Label>
+              <div className="space-y-3">
+                <Label htmlFor="className" className="text-base">Class Name *</Label>
                 <Input
                   id="className"
                   type="text"
@@ -265,20 +272,20 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                   value={className}
                   onChange={(e) => setClassName(e.target.value)}
                   required
-                  className="rounded-xl"
+                  className="rounded-xl h-12 text-base transition-all duration-200 focus:scale-[1.01]"
                 />
               </div>
 
               {/* Group */}
-              <div className="space-y-2">
-                <Label htmlFor="group">Group (optional)</Label>
+              <div className="space-y-3">
+                <Label htmlFor="group" className="text-base">Group (optional)</Label>
                 <Input
                   id="group"
                   type="text"
                   placeholder="e.g., Section A"
                   value={group}
                   onChange={(e) => setGroup(e.target.value)}
-                  className="rounded-xl"
+                  className="rounded-xl h-12 text-base transition-all duration-200 focus:scale-[1.01]"
                 />
               </div>
             </div>
@@ -286,11 +293,11 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
 
           {/* Step 1 - Schedule */}
           {currentStep === 1 && (
-            <div className="space-y-5">
+            <div className="space-y-6 animate-fade-in">
               {/* Session Type Toggle */}
-              <div className="space-y-2">
-                <Label>Session Type</Label>
-                <div className="flex gap-2">
+              <div className="space-y-3">
+                <Label className="text-base">Session Type</Label>
+                <div className="flex gap-3">
                   {(["Theory", "Practical"] as const).map((type) => (
                     <Button
                       key={type}
@@ -298,7 +305,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                       variant={sessionType === type ? "default" : "outline"}
                       onClick={() => setSessionType(type)}
                       className={cn(
-                        "flex-1 rounded-xl",
+                        "flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]",
                         sessionType === type && "bg-secondary text-secondary-foreground"
                       )}
                       aria-pressed={sessionType === type}
@@ -310,25 +317,24 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               </div>
 
               {/* Session Date */}
-              <div className="space-y-2">
-                <Label htmlFor="sessionDate">Session Date</Label>
+              <div className="space-y-3">
+                <Label htmlFor="sessionDate" className="text-base">Session Date</Label>
                 <Input
                   id="sessionDate"
                   type="date"
                   value={sessionDate}
                   onChange={(e) => setSessionDate(e.target.value)}
-                  className="rounded-xl"
+                  className="rounded-xl h-12 text-base"
                 />
               </div>
 
               {/* Start Time */}
-              <div className="space-y-2">
-                <Label htmlFor="startTime">Start Time</Label>
+              <div className="space-y-3">
+                <Label htmlFor="startTime" className="text-base">Start Time</Label>
                 <Select
                   value={startTime}
                   onValueChange={(v) => {
                     setStartTime(v);
-                    // Reset end time if it's not valid anymore
                     const newValidEndTimes = TIME_SLOTS.filter(
                       (_, index) => index > TIME_SLOTS.indexOf(v)
                     );
@@ -337,7 +343,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                     }
                   }}
                 >
-                  <SelectTrigger id="startTime" className="rounded-xl">
+                  <SelectTrigger id="startTime" className="rounded-xl h-12 text-base">
                     <SelectValue placeholder="Select start time" />
                   </SelectTrigger>
                   <SelectContent>
@@ -351,10 +357,10 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               </div>
 
               {/* End Time */}
-              <div className="space-y-2">
-                <Label htmlFor="endTime">End Time</Label>
+              <div className="space-y-3">
+                <Label htmlFor="endTime" className="text-base">End Time</Label>
                 <Select value={endTime} onValueChange={setEndTime}>
-                  <SelectTrigger id="endTime" className="rounded-xl">
+                  <SelectTrigger id="endTime" className="rounded-xl h-12 text-base">
                     <SelectValue placeholder="Select end time" />
                   </SelectTrigger>
                   <SelectContent>
@@ -371,12 +377,12 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
 
           {/* Step 2 - Settings */}
           {currentStep === 2 && (
-            <div className="space-y-6">
+            <div className="space-y-8 animate-fade-in">
               {/* Expected Students Slider */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="expectedStudents">Expected Students</Label>
-                  <span className="text-sm font-semibold bg-muted px-3 py-1 rounded-lg">
+                  <Label htmlFor="expectedStudents" className="text-base">Expected Students</Label>
+                  <span className="text-lg font-bold bg-secondary/10 text-secondary px-4 py-2 rounded-xl">
                     {expectedStudents}
                   </span>
                 </div>
@@ -390,15 +396,15 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                   className="py-2"
                   aria-label="Expected number of students"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Max students for {year} batch: {maxStudents}
                 </p>
               </div>
 
               {/* Timer Duration Selector */}
-              <div className="space-y-2">
-                <Label>Timer Duration</Label>
-                <div className="flex gap-2">
+              <div className="space-y-3">
+                <Label className="text-base">Timer Duration</Label>
+                <div className="flex gap-3">
                   {[3, 5].map((duration) => (
                     <Button
                       key={duration}
@@ -406,7 +412,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                       variant={timerDuration === duration ? "default" : "outline"}
                       onClick={() => setTimerDuration(duration)}
                       className={cn(
-                        "flex-1 rounded-xl",
+                        "flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]",
                         timerDuration === duration && "bg-secondary text-secondary-foreground"
                       )}
                       aria-pressed={timerDuration === duration}
@@ -418,27 +424,27 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               </div>
 
               {/* Notes */}
-              <div className="space-y-2">
-                <Label htmlFor="notes">Notes (optional)</Label>
+              <div className="space-y-3">
+                <Label htmlFor="notes" className="text-base">Notes (optional)</Label>
                 <Textarea
                   id="notes"
                   placeholder="Any additional notes for this session..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="rounded-xl resize-none"
-                  rows={3}
+                  className="rounded-xl resize-none text-base transition-all duration-200 focus:scale-[1.01]"
+                  rows={4}
                 />
               </div>
             </div>
           )}
 
           {/* Navigation Buttons */}
-          <div className="flex gap-3 pt-6 mt-6 border-t border-border">
+          <div className="flex gap-4 pt-8 mt-8 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={handleBack}
-              className="flex-1 rounded-xl"
+              className="flex-1 rounded-xl h-12 text-base transition-all duration-200 hover:scale-[1.02]"
             >
               {currentStep === 0 ? "Cancel" : "Back"}
             </Button>
@@ -447,7 +453,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
                 type="button"
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex-1 rounded-xl bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                className="flex-1 rounded-xl h-12 text-base bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 hover:scale-[1.02]"
               >
                 Next
               </Button>
@@ -455,7 +461,7 @@ export function CreateSession({ onNavigate, onStartSession }: CreateSessionProps
               <Button
                 type="button"
                 onClick={handleSubmit}
-                className="flex-1 rounded-xl bg-accent hover:bg-accent/90 text-accent-foreground"
+                className="flex-1 rounded-xl h-12 text-base bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-200 hover:scale-[1.02]"
               >
                 Start Session
               </Button>
