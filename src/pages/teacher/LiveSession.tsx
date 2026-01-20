@@ -121,25 +121,25 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Bar - Fixed */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 py-3">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border px-4 py-3">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
-          {/* Left: Info Pills */}
+          {/* Left: Info Pills - Professional colors */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-medium">
+            <span className="px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium">
               {sessionParams.semester} Semester
             </span>
-            <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
+            <span className="px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium">
               {sessionParams.year}
             </span>
-            <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+            <span className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium">
               {sessionParams.className}
             </span>
             {sessionParams.group && (
-              <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
+              <span className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs font-medium">
                 {sessionParams.group}
               </span>
             )}
-            <span className="px-3 py-1 rounded-full bg-highlight/10 text-highlight text-xs font-medium">
+            <span className="px-3 py-1.5 rounded-lg bg-secondary/10 text-secondary text-xs font-medium">
               {sessionParams.sessionType}
             </span>
           </div>
@@ -168,7 +168,7 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Left Side (70%) - Roll Grid */}
             <div className="lg:w-[70%] animate-slide-up">
-              <div className="bg-card rounded-3xl p-6 shadow-lg border border-border h-full">
+              <div className="bg-card rounded-3xl p-6 shadow-xl border border-border h-full">
                 {/* Grid Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div>
@@ -209,52 +209,48 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
 
             {/* Right Side (30%) - QR & Timer */}
             <div className="lg:w-[30%] animate-slide-up" style={{ animationDelay: "0.1s" }}>
-              <div className="bg-card rounded-3xl p-6 shadow-lg border border-border sticky top-20">
-                {/* QR Section */}
-                <div className="text-center">
-                  <h3 className="font-serif text-lg mb-4">Scan to Mark Attendance</h3>
+              <div className="bg-card rounded-3xl p-6 shadow-xl border border-border sticky top-20">
+                {/* QR Section with all elements inside */}
+                <div className="text-center space-y-4">
+                  {/* Title moved up */}
+                  <h3 className="font-serif text-lg">Scan to Mark Attendance</h3>
                   
-                  {/* QR Box with animation inside */}
-                  <div className="relative mx-auto mb-6">
+                  {/* QR Box */}
+                  <div className="relative mx-auto">
                     <QRPlaceholder isActive={isSessionActive} size="lg" />
                   </div>
 
-                  {/* Countdown Timer - Smaller */}
-                  <div className="pt-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground mb-2">Time Remaining</p>
+                  {/* Timer section - no borders */}
+                  <div className="pt-2">
+                    <p className="text-xs text-muted-foreground mb-1">Time Remaining</p>
                     <CountdownTimer
                       initialMinutes={sessionParams.timerDuration}
                       onExpire={handleSessionExpire}
                       onTimeUpdate={handleTimeUpdate}
                       isRunning={isSessionActive}
-                      size="sm"
+                      size="md"
                     />
-                    {!isSessionActive && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        QR code is no longer valid
-                      </p>
-                    )}
                   </div>
 
-                  {/* End Session Button - Inside QR Box */}
+                  {/* End Session Button */}
                   {isSessionActive && (
-                    <div className="mt-4 pt-4 border-t border-border">
+                    <div className="pt-4">
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
                             variant="destructive"
-                            className="w-full rounded-xl gap-2 transition-all duration-200 hover:scale-[1.02]"
+                            className="w-full rounded-xl gap-2 transition-all duration-300 hover:scale-[1.02]"
                             aria-label="End attendance session early"
                           >
                             <StopCircle className="w-4 h-4" />
                             End Session Early
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent className="animate-scale-in">
+                        <AlertDialogContent className="rounded-2xl animate-scale-in">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>End Session Early?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will stop the attendance session immediately. Students will no longer be able to mark their attendance.
+                            <AlertDialogTitle className="font-serif text-xl">End Session Early?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-muted-foreground">
+                              This will stop the attendance session immediately. Students will no longer be able to scan the QR code and mark their attendance.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -270,6 +266,12 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
                       </AlertDialog>
                     </div>
                   )}
+
+                  {!isSessionActive && (
+                    <p className="text-sm text-muted-foreground">
+                      QR code is no longer valid
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -281,25 +283,25 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
       <Dialog open={showEndPopup} onOpenChange={setShowEndPopup}>
         <DialogContent className="rounded-3xl sm:max-w-md animate-scale-in">
           <DialogHeader className="text-center">
-            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4 animate-pop">
               <CheckCircle className="w-10 h-10 text-success" aria-hidden="true" />
             </div>
             <DialogTitle className="font-serif text-2xl">Session Complete!</DialogTitle>
-            <DialogDescription className="text-center">
+            <DialogDescription className="text-center space-y-2">
               <p className="text-lg font-semibold mt-2">
                 <span className="text-success">{markedStudents.length}</span>
                 <span className="text-muted-foreground"> / {sessionParams.expectedStudents}</span>
                 <span className="text-muted-foreground"> students marked present</span>
               </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Attendance record has been uploaded to server
+              <p className="text-sm text-muted-foreground">
+                Attendance record has been saved successfully
               </p>
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex flex-col gap-3 sm:flex-col">
+          <DialogFooter className="flex flex-col gap-3 sm:flex-col pt-4">
             <Button
               onClick={handleDownloadCSV}
-              className="w-full rounded-xl gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 hover:scale-[1.02]"
+              className="w-full rounded-xl gap-2 bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-[1.02]"
             >
               <Download className="w-4 h-4" aria-hidden="true" />
               Download Attendance Record
@@ -307,7 +309,7 @@ export function LiveSession({ onNavigate, sessionParams }: LiveSessionProps) {
             <Button
               onClick={handleBackToDashboard}
               variant="outline"
-              className="w-full rounded-xl gap-2 transition-all duration-200 hover:scale-[1.02]"
+              className="w-full rounded-xl gap-2 transition-all duration-300 hover:scale-[1.02]"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               Back to Dashboard

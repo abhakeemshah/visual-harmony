@@ -1,4 +1,4 @@
-import { Users, GraduationCap, Sparkles } from "lucide-react";
+import { Users, GraduationCap, Sparkles, BookOpen, Clock, Shield, Zap } from "lucide-react";
 import { RoleCard } from "@/components/ui/role-card";
 
 interface LandingProps {
@@ -6,12 +6,67 @@ interface LandingProps {
 }
 
 export function Landing({ onNavigate }: LandingProps) {
+  const features = [
+    {
+      icon: Clock,
+      title: "Real-time Tracking",
+      description: "Instant QR-based attendance with live updates",
+      color: "bg-primary/10 text-primary",
+    },
+    {
+      icon: Shield,
+      title: "Secure & Reliable",
+      description: "Data encryption and backup systems",
+      color: "bg-secondary/10 text-secondary",
+    },
+    {
+      icon: BookOpen,
+      title: "Easy Reports",
+      description: "Download attendance records anytime",
+      color: "bg-accent/10 text-accent",
+    },
+    {
+      icon: Zap,
+      title: "Fast Setup",
+      description: "Start a session in under 30 seconds",
+      color: "bg-success/10 text-success",
+    },
+  ];
+
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        {/* Gradient orbs */}
+        <div 
+          className="absolute top-20 -left-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl animate-float-around"
+          style={{ animationDelay: "0s" }}
+        />
+        <div 
+          className="absolute top-1/2 -right-40 w-96 h-96 rounded-full bg-secondary/5 blur-3xl animate-float-around"
+          style={{ animationDelay: "3s" }}
+        />
+        <div 
+          className="absolute -bottom-20 left-1/3 w-72 h-72 rounded-full bg-accent/5 blur-3xl animate-float-around"
+          style={{ animationDelay: "6s" }}
+        />
+        
+        {/* Rotating decoration */}
+        <div className="absolute top-40 right-20 w-32 h-32 opacity-20">
+          <div className="w-full h-full border-2 border-primary/30 rounded-2xl animate-rotate-slow" />
+        </div>
+        <div className="absolute bottom-40 left-20 w-24 h-24 opacity-20">
+          <div className="w-full h-full border-2 border-secondary/30 rounded-full animate-rotate-slow" style={{ animationDirection: "reverse" }} />
+        </div>
+        
+        {/* Dot pattern overlay */}
+        <div className="absolute inset-0 bg-dots-pattern opacity-30" />
+      </div>
+
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
+      <section className="container mx-auto px-4 py-16 md:py-24 relative">
         <div className="max-w-4xl mx-auto text-center space-y-6 animate-slide-up">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-medium">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
             <Sparkles className="w-4 h-4" />
             <span>Smart Attendance System</span>
           </div>
@@ -36,7 +91,7 @@ export function Landing({ onNavigate }: LandingProps) {
             To Track <span className="text-primary">Attendance</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Build your classroom network, track attendance effortlessly, and open up
             on the learning platform where you can be your whole self. No more paper
             sheets or manual tracking.
@@ -45,57 +100,62 @@ export function Landing({ onNavigate }: LandingProps) {
       </section>
 
       {/* Role Selection */}
-      <section className="container mx-auto px-4 py-8 md:py-16">
+      <section className="container mx-auto px-4 py-8 md:py-16 relative">
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          <div className="animate-slide-up" style={{ animationDelay: "0.1s" }}>
+          <div className="animate-slide-up" style={{ animationDelay: "0.1s", animationFillMode: "both" }}>
             <RoleCard
               title="Teacher"
               description="Create QR sessions and monitor student attendance in real-time"
               icon={Users}
               onClick={() => onNavigate("teacher-auth")}
-              variant="secondary"
+              variant="primary"
             />
           </div>
-          <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
+          <div className="animate-slide-up" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
             <RoleCard
               title="Student"
               description="Scan QR codes to mark your attendance quickly and easily"
               icon={GraduationCap}
               onClick={() => onNavigate("student-entry")}
-              variant="accent"
+              variant="secondary"
             />
           </div>
         </div>
       </section>
 
-      {/* Visual Section with Colored Frames */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="flex flex-wrap justify-center gap-4">
-          {[
-            { bg: "bg-accent", rotate: "-rotate-6", delay: "0.1s" },
-            { bg: "bg-highlight", rotate: "rotate-3", delay: "0.2s" },
-            { bg: "bg-primary", rotate: "-rotate-3", delay: "0.3s" },
-            { bg: "bg-secondary", rotate: "rotate-6", delay: "0.4s" },
-          ].map((item, index) => (
+      {/* Feature Cards */}
+      <section className="container mx-auto px-4 py-16 relative">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          {features.map((feature, index) => (
             <div
-              key={index}
-              className={`${item.bg} ${item.rotate} w-20 h-24 md:w-28 md:h-32 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 ease-out hover:scale-110 hover:rotate-0 animate-slide-up`}
-              style={{ animationDelay: item.delay }}
+              key={feature.title}
+              className="group bg-card rounded-2xl p-5 shadow-sm border border-border hover-lift animate-slide-up cursor-default"
+              style={{ animationDelay: `${0.1 + index * 0.1}s`, animationFillMode: "both" }}
             >
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/30 backdrop-blur-sm" />
+              <div className={`w-12 h-12 rounded-xl ${feature.color} flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110`}>
+                <feature.icon className="w-6 h-6" />
+              </div>
+              <h3 className="font-semibold text-sm mb-1">{feature.title}</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Growth Mindset Section */}
-      <section className="bg-primary text-primary-foreground py-16 md:py-24 rounded-t-[3rem] mt-8">
-        <div className="container mx-auto px-4">
+      <section className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground py-16 md:py-24 rounded-t-[3rem] mt-8 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-40 h-40 border-2 border-white rounded-full animate-float" />
+          <div className="absolute bottom-10 right-10 w-32 h-32 border-2 border-white rounded-2xl animate-float" style={{ animationDelay: "1s" }} />
+        </div>
+        
+        <div className="container mx-auto px-4 relative">
           <div className="max-w-3xl mx-auto">
             <p className="font-serif text-2xl md:text-4xl leading-relaxed">
               Within Any <span className="inline-block">✦</span> Career Field, The
               Belief That You Can Improve Will Motivate You To{" "}
-              <span className="underline decoration-wavy decoration-highlight underline-offset-8">
+              <span className="underline decoration-wavy decoration-primary-foreground/50 underline-offset-8">
                 Persevere
               </span>{" "}
               <span className="inline-block">✦</span> Despite Obstacles. Here Are

@@ -36,12 +36,12 @@ export function RollGrid({
             aria-pressed={isMarked}
             role="gridcell"
             className={cn(
-              "w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-lg text-sm font-semibold transition-all duration-200",
+              "w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl text-base font-bold transition-all duration-300",
               interactive && "cursor-pointer hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
               !interactive && "cursor-default",
               isMarked
                 ? "bg-success text-success-foreground shadow-lg animate-pop"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                : "bg-muted text-muted-foreground"
             )}
           >
             {roll}
