@@ -35,33 +35,6 @@ export function Landing({ onNavigate }: LandingProps) {
 
   return (
     <div className="min-h-screen pt-20 relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        {/* Gradient orbs */}
-        <div 
-          className="absolute top-20 -left-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl animate-float-around"
-          style={{ animationDelay: "0s" }}
-        />
-        <div 
-          className="absolute top-1/2 -right-40 w-96 h-96 rounded-full bg-secondary/5 blur-3xl animate-float-around"
-          style={{ animationDelay: "3s" }}
-        />
-        <div 
-          className="absolute -bottom-20 left-1/3 w-72 h-72 rounded-full bg-accent/5 blur-3xl animate-float-around"
-          style={{ animationDelay: "6s" }}
-        />
-        
-        {/* Rotating decoration */}
-        <div className="absolute top-40 right-20 w-32 h-32 opacity-20">
-          <div className="w-full h-full border-2 border-primary/30 rounded-2xl animate-rotate-slow" />
-        </div>
-        <div className="absolute bottom-40 left-20 w-24 h-24 opacity-20">
-          <div className="w-full h-full border-2 border-secondary/30 rounded-full animate-rotate-slow" style={{ animationDirection: "reverse" }} />
-        </div>
-        
-        {/* Dot pattern overlay */}
-        <div className="absolute inset-0 bg-dots-pattern opacity-30" />
-      </div>
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24 relative">
