@@ -117,7 +117,15 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Animated Gradient Background */}
+      <div className="animated-gradient-bg">
+        <div className="gradient-orb gradient-orb-1" />
+        <div className="gradient-orb gradient-orb-2" />
+        <div className="gradient-orb gradient-orb-3" />
+        <div className="gradient-orb gradient-orb-4" />
+      </div>
+      
       {showNavbar && <Navbar currentPage={currentPage} onNavigate={handleNavigate} />}
       {renderPage()}
     </div>

@@ -339,6 +339,91 @@
   animation: float-around 10s ease-in-out infinite;
 }
 
+/* Global Animated Gradient Background */
+@keyframes gradient-move {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes blob-move {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  75% {
+    transform: translate(-40px, -30px) scale(1.05);
+  }
+}
+
+.animated-gradient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  background: linear-gradient(
+    -45deg,
+    hsl(var(--background)),
+    hsl(175 85% 95%),
+    hsl(220 70% 95%),
+    hsl(260 80% 95%),
+    hsl(var(--background))
+  );
+  background-size: 400% 400%;
+  animation: gradient-move 15s ease infinite;
+}
+
+.gradient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.4;
+  animation: blob-move 20s ease-in-out infinite;
+}
+
+.gradient-orb-1 {
+  width: 400px;
+  height: 400px;
+  background: hsl(175 85% 70% / 0.3);
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.gradient-orb-2 {
+  width: 350px;
+  height: 350px;
+  background: hsl(220 70% 70% / 0.3);
+  top: 50%;
+  right: 10%;
+  animation-delay: -5s;
+}
+
+.gradient-orb-3 {
+  width: 300px;
+  height: 300px;
+  background: hsl(260 80% 75% / 0.3);
+  bottom: 20%;
+  left: 30%;
+  animation-delay: -10s;
+}
+
+.gradient-orb-4 {
+  width: 250px;
+  height: 250px;
+  background: hsl(152 70% 70% / 0.3);
+  top: 30%;
+  right: 30%;
+  animation-delay: -15s;
+}
+
 /* Smooth transition defaults */
 .transition-smooth {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
