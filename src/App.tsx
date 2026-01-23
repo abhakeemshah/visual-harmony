@@ -117,7 +117,7 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen relative">
       {/* Animated Gradient Background */}
       <div className="animated-gradient-bg">
         <div className="gradient-orb gradient-orb-1" />
@@ -126,8 +126,10 @@ function AppContent() {
         <div className="gradient-orb gradient-orb-4" />
       </div>
       
-      {showNavbar && <Navbar currentPage={currentPage} onNavigate={handleNavigate} />}
-      {renderPage()}
+      <div className="relative z-10">
+        {showNavbar && <Navbar currentPage={currentPage} onNavigate={handleNavigate} />}
+        {renderPage()}
+      </div>
     </div>
   );
 }
