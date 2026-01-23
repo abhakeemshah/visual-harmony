@@ -339,28 +339,45 @@
   animation: float-around 10s ease-in-out infinite;
 }
 
-/* Global Animated Gradient Background */
-@keyframes gradient-move {
+/* Spectral Aurora Gradient Background */
+@keyframes aurora-flow {
   0%, 100% {
     background-position: 0% 50%;
+    filter: hue-rotate(0deg);
+  }
+  25% {
+    background-position: 50% 100%;
   }
   50% {
     background-position: 100% 50%;
+    filter: hue-rotate(30deg);
+  }
+  75% {
+    background-position: 50% 0%;
   }
 }
 
-@keyframes blob-move {
+@keyframes spectral-pulse {
   0%, 100% {
-    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+    transform: scale(1) rotate(0deg);
   }
-  25% {
-    transform: translate(30px, -50px) scale(1.1);
+  33% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(120deg);
+  }
+  66% {
+    opacity: 0.5;
+    transform: scale(0.9) rotate(240deg);
+  }
+}
+
+@keyframes color-shift {
+  0%, 100% {
+    filter: hue-rotate(0deg) saturate(1.2);
   }
   50% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  75% {
-    transform: translate(-40px, -30px) scale(1.05);
+    filter: hue-rotate(45deg) saturate(1.5);
   }
 }
 
@@ -368,60 +385,66 @@
   position: fixed;
   inset: 0;
   z-index: -10;
-  background: linear-gradient(
-    -45deg,
-    hsl(var(--background)),
-    hsl(175 85% 95%),
-    hsl(220 70% 95%),
-    hsl(260 80% 95%),
-    hsl(var(--background))
-  );
-  background-size: 400% 400%;
-  animation: gradient-move 15s ease infinite;
+  background: 
+    radial-gradient(ellipse at 20% 20%, hsl(330 80% 60% / 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, hsl(280 90% 55% / 0.35) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 60%, hsl(200 90% 50% / 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 80%, hsl(175 85% 45% / 0.35) 0%, transparent 45%),
+    radial-gradient(ellipse at 90% 70%, hsl(220 85% 55% / 0.3) 0%, transparent 50%),
+    linear-gradient(135deg, 
+      hsl(30 20% 98%) 0%,
+      hsl(330 60% 95%) 20%,
+      hsl(280 70% 92%) 40%,
+      hsl(200 80% 92%) 60%,
+      hsl(175 70% 94%) 80%,
+      hsl(30 20% 98%) 100%
+    );
+  background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%, 300% 300%;
+  animation: aurora-flow 20s ease-in-out infinite, color-shift 30s ease-in-out infinite;
 }
 
 .gradient-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.4;
-  animation: blob-move 20s ease-in-out infinite;
+  filter: blur(80px);
+  mix-blend-mode: screen;
+  animation: spectral-pulse 15s ease-in-out infinite;
 }
 
 .gradient-orb-1 {
-  width: 400px;
-  height: 400px;
-  background: hsl(175 85% 70% / 0.3);
-  top: 10%;
-  left: 10%;
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(135deg, hsl(330 90% 65% / 0.5), hsl(280 80% 60% / 0.3));
+  top: -10%;
+  left: 5%;
   animation-delay: 0s;
 }
 
 .gradient-orb-2 {
-  width: 350px;
-  height: 350px;
-  background: hsl(220 70% 70% / 0.3);
-  top: 50%;
-  right: 10%;
+  width: 450px;
+  height: 450px;
+  background: linear-gradient(225deg, hsl(280 85% 60% / 0.4), hsl(200 90% 55% / 0.4));
+  top: 40%;
+  right: -5%;
   animation-delay: -5s;
 }
 
 .gradient-orb-3 {
-  width: 300px;
-  height: 300px;
-  background: hsl(260 80% 75% / 0.3);
-  bottom: 20%;
-  left: 30%;
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(45deg, hsl(200 90% 55% / 0.45), hsl(175 85% 50% / 0.35));
+  bottom: 10%;
+  left: 20%;
   animation-delay: -10s;
 }
 
 .gradient-orb-4 {
-  width: 250px;
-  height: 250px;
-  background: hsl(152 70% 70% / 0.3);
-  top: 30%;
-  right: 30%;
-  animation-delay: -15s;
+  width: 350px;
+  height: 350px;
+  background: linear-gradient(315deg, hsl(175 80% 55% / 0.4), hsl(220 85% 60% / 0.3));
+  top: 20%;
+  right: 25%;
+  animation-delay: -7s;
 }
 
 /* Smooth transition defaults */
