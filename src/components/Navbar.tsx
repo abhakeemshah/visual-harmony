@@ -1,4 +1,4 @@
-import { Code2, Menu, X, Sparkles } from "lucide-react";
+import { Code2, Menu, X, Sparkles, Shield } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -51,8 +51,8 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
           ))}
         </div>
 
-        {/* Developers Button */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Action Buttons */}
+        <div className="hidden md:flex items-center gap-3">
           <Button
             variant="outline"
             size="sm"
@@ -61,6 +61,15 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
           >
             <Code2 className="w-4 h-4" />
             <span>Developers</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onNavigate("admin-login")}
+            className="rounded-full gap-2 border-border hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all duration-300"
+          >
+            <Shield className="w-4 h-4" />
+            <span>Admin</span>
           </Button>
         </div>
 
@@ -94,18 +103,32 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
                 {link.label}
               </button>
             ))}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                onNavigate("developers");
-                setMobileMenuOpen(false);
-              }}
-              className="rounded-full gap-2 border-border w-fit hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 mt-2"
-            >
-              <Code2 className="w-4 h-4" />
-              <span>Developers</span>
-            </Button>
+            <div className="flex gap-2 mt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onNavigate("developers");
+                  setMobileMenuOpen(false);
+                }}
+                className="rounded-full gap-2 border-border hover:bg-secondary hover:text-secondary-foreground transition-all duration-300"
+              >
+                <Code2 className="w-4 h-4" />
+                <span>Developers</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onNavigate("admin-login");
+                  setMobileMenuOpen(false);
+                }}
+                className="rounded-full gap-2 border-border hover:bg-secondary hover:text-secondary-foreground transition-all duration-300"
+              >
+                <Shield className="w-4 h-4" />
+                <span>Admin</span>
+              </Button>
+            </div>
           </div>
         </div>
       )}
